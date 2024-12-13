@@ -1,0 +1,45 @@
+menu "LVGL ESP configuration"
+
+    config LV_ESP_MALLOC_IN_SPIRAM
+        bool "Allocate LVGL memory in SPIRAM"
+        default y if SPIRAM
+        depends on SPIRAM && (LV_USE_BUILTIN_MALLOC || LV_USE_CUSTOM_MALLOC)
+        
+    config LV_MEM_POOL_INCLUDE
+        string
+        default "lv_esp_mem.h" if LV_ESP_MALLOC_IN_SPIRAM
+        depends on LV_USE_BUILTIN_MALLOC
+
+    config LV_ESP_EVENT_TASK_QUEUE_SIZE
+        int "LVGL event task queue size"
+        default 8192
+
+    config LV_ESP_EVENT_TASK_QUEUE_IN_SPIRAM
+        bool "Allocate event queue in SPIRAM"
+        default y if SPIRAM
+        depends on SPIRAM
+
+    config LV_ESP_EVENT_TASK_STACK_SIZE
+        int "LVGL event task stack size"
+        default 8192
+
+    config LV_ESP_EVENT_TASK_PRIORITY
+        int "LVGL event task priority"
+        default 2
+
+    choice LV_ESP_EVENT_TASK_CORE_ID
+        depends on !FREERTOS_UNICORE
+        prompt "LVGL Task Core ID"
+        default LV_ESP_EVENT_TASK_NO_AFFINITY
+        help
+            Pin the LVGL event task to a certain core(0/1). It can also be done automatically choosing NO_AFFINITY.
+
+        config LV_ESP_EVENT_TASK_CORE_0
+            bool "Core 0"
+        config LV_ESP_EVENT_TASK_CORE_1
+            bool "Core 1"
+        config LV_ESP_EVENT_TASK_NO_AFFINITY
+            bool "No Affinity"
+    endchoice    
+
+endmenu
